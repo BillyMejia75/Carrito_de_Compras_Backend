@@ -27,11 +27,11 @@ namespace APICarritoCompras.Repositorio
         public async Task<UsuarioDetalleDTO> GetUsuarioById(int id)
         {
             //Usuario usuario = await _db.Usuarios.FindAsync(id);
-            Usuario usuario = await _db.Usuarios
-                .Include(u => u.UsuarioRoles)
+            Usuario usuario = await _db.Usuarios.FindAsync(id);
+                /*.Include(u => u.UsuarioRoles)
                     .ThenInclude(ur => ur.Rol)
-                .Include(u => u.Ordenes).FirstOrDefaultAsync(u => u.Id == id);
-
+                .Include(u => u.Ordenes).FirstOrDefaultAsync(u => u.Id == id);*/
+            
             return _mapper.Map<UsuarioDetalleDTO>(usuario);
         }
 
@@ -55,7 +55,7 @@ namespace APICarritoCompras.Repositorio
                 .Include(r => r.UsuarioRoles)
                     .ThenInclude(ur => ur.Rol)
                 .Include(o => o.Ordenes).ToListAsync();
-
+            
             return _mapper.Map<List<UsuarioDetalleDTO>>(listaUsuarioDetalle);
         }
 

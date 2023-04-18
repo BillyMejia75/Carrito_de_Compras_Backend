@@ -76,7 +76,7 @@ namespace APICarritoCompras.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<ActionResult> Login(UsuarioDTO usuario)
+        public async Task<ActionResult> Login(LoginDTO usuario)
         {
             try
             {
@@ -121,7 +121,12 @@ namespace APICarritoCompras.Controllers
                 var respuesta = await _usuarioRepositorio.Registrarse(
                 new Usuario
                 {
-                    NombreUsuario = usuario.NombreUsuario
+                    NombreUsuario = usuario.NombreUsuario,
+                    Nombres = usuario.Nombres,
+                    Apellidos = usuario.Apellidos,
+                    Direccion = usuario.Direccion,
+                    Telefono = usuario.Telefono,
+                    TipoUsuario = usuario.TipoUsuario
                 },  usuario.Contraseña);
 
                 if (respuesta == "Existe")

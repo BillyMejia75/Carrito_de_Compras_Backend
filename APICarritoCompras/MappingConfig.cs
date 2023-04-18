@@ -20,6 +20,9 @@ namespace APICarritoCompras
                 config.CreateMap<Usuario, UsuarioDetalleDTO>();
                 config.CreateMap<UsuarioDetalleDTO, Usuario>();
 
+                config.CreateMap<Usuario, LoginDTO>();
+                config.CreateMap<LoginDTO, Usuario>();
+
                 config.CreateMap<RolDTO, Rol>();
                 config.CreateMap<Rol, RolDTO>();//.ForMember(dest => dest.IdRol, opt => opt.MapFrom(src => src.Id));
 

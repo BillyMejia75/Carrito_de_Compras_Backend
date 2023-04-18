@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APICarritoCompras.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230403020207_UnaSola")]
-    partial class UnaSola
+    [Migration("20230408170237_FixDatabase")]
+    partial class FixDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,19 +24,46 @@ namespace APICarritoCompras.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("APICarritoCompras.Models.Orden", b =>
+            modelBuilder.Entity("APICarritoCompras.Models.Cliente", b =>
                 {
-                    b.Property<int>("IdOrden")
+                    b.Property<int?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdOrden"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
+
+                    b.Property<string>("Apellidos")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Direccion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombres")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Telefono")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("Cliente");
+                });
+
+            modelBuilder.Entity("APICarritoCompras.Models.Orden", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("IdUsuario")
-                        .HasColumnType("int");
 
                     b.Property<float>("Total")
                         .HasColumnType("real");
@@ -44,7 +71,7 @@ namespace APICarritoCompras.Migrations
                     b.Property<int>("UsuarioId")
                         .HasColumnType("int");
 
-                    b.HasKey("IdOrden");
+                    b.HasKey("Id");
 
                     b.HasIndex("UsuarioId");
 
@@ -124,12 +151,6 @@ namespace APICarritoCompras.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("IdRol")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdUsuario")
-                        .HasColumnType("int");
-
                     b.Property<int>("RolId")
                         .HasColumnType("int");
 
@@ -143,6 +164,17 @@ namespace APICarritoCompras.Migrations
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("UsuarioRol");
+                });
+
+            modelBuilder.Entity("APICarritoCompras.Models.Cliente", b =>
+                {
+                    b.HasOne("APICarritoCompras.Models.Usuario", "Usuario")
+                        .WithMany("Cliente")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("APICarritoCompras.Models.Orden", b =>
@@ -182,6 +214,8 @@ namespace APICarritoCompras.Migrations
 
             modelBuilder.Entity("APICarritoCompras.Models.Usuario", b =>
                 {
+                    b.Navigation("Cliente");
+
                     b.Navigation("Ordenes");
 
                     b.Navigation("UsuarioRoles");

@@ -6,18 +6,18 @@ namespace APICarritoCompras.Models
     {
         [Key]
         public int IdProducto { get; set; }
-
-        [Required]
+        public string? Imagen { get; set; }
         public string? NombreProducto { get; set; }
-
-        [Required]
         public string? Descripcion { get; set; }
-
-        [Required]
         public float Precio { get; set; }
-
-        [Required]
         public int Stock { get; set; }
+
+
+        public int CategoriaId { get; set; }
+        public Categoria Categoria { get; set; }
         
+
+
+        public ICollection<OrdenProducto> OrdenProducto { get; set; }
     }
 }

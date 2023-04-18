@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APICarritoCompras.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230403031545_test2")]
-    partial class test2
+    [Migration("20230411195708_ImagenProducto")]
+    partial class ImagenProducto
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,13 +24,48 @@ namespace APICarritoCompras.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("APICarritoCompras.Models.Orden", b =>
+            modelBuilder.Entity("APICarritoCompras.Models.Categoria", b =>
                 {
-                    b.Property<int>("IdOrden")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdOrden"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("NombreCategoria")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categoria");
+                });
+
+            modelBuilder.Entity("APICarritoCompras.Models.EstadoOrden", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Estado")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EstadoOrden");
+                });
+
+            modelBuilder.Entity("APICarritoCompras.Models.Orden", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("EstadoOrdenId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
@@ -41,11 +76,39 @@ namespace APICarritoCompras.Migrations
                     b.Property<int>("UsuarioId")
                         .HasColumnType("int");
 
-                    b.HasKey("IdOrden");
+                    b.HasKey("Id");
+
+                    b.HasIndex("EstadoOrdenId");
 
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("Orden");
+                });
+
+            modelBuilder.Entity("APICarritoCompras.Models.OrdenProducto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrdenId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrdenId");
+
+                    b.HasIndex("ProductoId");
+
+                    b.ToTable("OrdenProducto");
                 });
 
             modelBuilder.Entity("APICarritoCompras.Models.Producto", b =>
@@ -56,12 +119,16 @@ namespace APICarritoCompras.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdProducto"), 1L, 1);
 
+                    b.Property<int>("CategoriaId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Descripcion")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Imagen")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NombreProducto")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("Precio")
@@ -71,6 +138,8 @@ namespace APICarritoCompras.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("IdProducto");
+
+                    b.HasIndex("CategoriaId");
 
                     b.ToTable("Productos");
                 });
@@ -99,7 +168,16 @@ namespace APICarritoCompras.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("Apellidos")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Direccion")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("NombreUsuario")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombres")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("PasswordHash")
@@ -107,6 +185,12 @@ namespace APICarritoCompras.Migrations
 
                     b.Property<byte[]>("PasswordSalt")
                         .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Telefono")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TipoUsuario")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -138,13 +222,51 @@ namespace APICarritoCompras.Migrations
 
             modelBuilder.Entity("APICarritoCompras.Models.Orden", b =>
                 {
+                    b.HasOne("APICarritoCompras.Models.EstadoOrden", "EstadoOrden")
+                        .WithMany()
+                        .HasForeignKey("EstadoOrdenId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("APICarritoCompras.Models.Usuario", "Usuario")
                         .WithMany("Ordenes")
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("EstadoOrden");
+
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("APICarritoCompras.Models.OrdenProducto", b =>
+                {
+                    b.HasOne("APICarritoCompras.Models.Orden", "Orden")
+                        .WithMany("OrdenProducto")
+                        .HasForeignKey("OrdenId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("APICarritoCompras.Models.Producto", "Producto")
+                        .WithMany("OrdenProducto")
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Orden");
+
+                    b.Navigation("Producto");
+                });
+
+            modelBuilder.Entity("APICarritoCompras.Models.Producto", b =>
+                {
+                    b.HasOne("APICarritoCompras.Models.Categoria", "Categoria")
+                        .WithMany()
+                        .HasForeignKey("CategoriaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Categoria");
                 });
 
             modelBuilder.Entity("APICarritoCompras.Models.UsuarioRol", b =>
@@ -164,6 +286,16 @@ namespace APICarritoCompras.Migrations
                     b.Navigation("Rol");
 
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("APICarritoCompras.Models.Orden", b =>
+                {
+                    b.Navigation("OrdenProducto");
+                });
+
+            modelBuilder.Entity("APICarritoCompras.Models.Producto", b =>
+                {
+                    b.Navigation("OrdenProducto");
                 });
 
             modelBuilder.Entity("APICarritoCompras.Models.Rol", b =>

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace APICarritoCompras.Migrations
 {
-    public partial class UnaSola : Migration
+    public partial class FixDatabase : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -54,19 +54,41 @@ namespace APICarritoCompras.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orden",
+                name: "Cliente",
                 columns: table => new
                 {
-                    IdOrden = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Total = table.Column<float>(type: "real", nullable: false),
-                    IdUsuario = table.Column<int>(type: "int", nullable: false),
+                    Nombres = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Apellidos = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Direccion = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Telefono = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UsuarioId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Orden", x => x.IdOrden);
+                    table.PrimaryKey("PK_Cliente", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Cliente_Usuarios_UsuarioId",
+                        column: x => x.UsuarioId,
+                        principalTable: "Usuarios",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Orden",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Total = table.Column<float>(type: "real", nullable: false),
+                    UsuarioId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orden", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Orden_Usuarios_UsuarioId",
                         column: x => x.UsuarioId,
@@ -81,8 +103,6 @@ namespace APICarritoCompras.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    IdUsuario = table.Column<int>(type: "int", nullable: false),
-                    IdRol = table.Column<int>(type: "int", nullable: false),
                     UsuarioId = table.Column<int>(type: "int", nullable: false),
                     RolId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -104,6 +124,11 @@ namespace APICarritoCompras.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Cliente_UsuarioId",
+                table: "Cliente",
+                column: "UsuarioId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orden_UsuarioId",
                 table: "Orden",
                 column: "UsuarioId");
@@ -121,6 +146,9 @@ namespace APICarritoCompras.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Cliente");
+
             migrationBuilder.DropTable(
                 name: "Orden");
 

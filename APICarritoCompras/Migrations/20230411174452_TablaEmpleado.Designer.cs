@@ -4,6 +4,7 @@ using APICarritoCompras.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APICarritoCompras.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230411174452_TablaEmpleado")]
+    partial class TablaEmpleado
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,6 +38,61 @@ namespace APICarritoCompras.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categoria");
+                });
+
+            modelBuilder.Entity("APICarritoCompras.Models.Cliente", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
+
+                    b.Property<string>("Apellidos")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Direccion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombres")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Telefono")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("Cliente");
+                });
+
+            modelBuilder.Entity("APICarritoCompras.Models.Empleados", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Apellidos")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CorreoElectronico")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaContratacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Nombres")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Empleados");
                 });
 
             modelBuilder.Entity("APICarritoCompras.Models.EstadoOrden", b =>
@@ -62,6 +119,9 @@ namespace APICarritoCompras.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("int");
+
                     b.Property<int>("EstadoOrdenId")
                         .HasColumnType("int");
 
@@ -71,14 +131,11 @@ namespace APICarritoCompras.Migrations
                     b.Property<float>("Total")
                         .HasColumnType("real");
 
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("EstadoOrdenId");
+                    b.HasIndex("ClienteId");
 
-                    b.HasIndex("UsuarioId");
+                    b.HasIndex("EstadoOrdenId");
 
                     b.ToTable("Orden");
                 });
@@ -123,9 +180,6 @@ namespace APICarritoCompras.Migrations
                     b.Property<string>("Descripcion")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Imagen")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("NombreProducto")
                         .HasColumnType("nvarchar(max)");
 
@@ -166,16 +220,7 @@ namespace APICarritoCompras.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Apellidos")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Direccion")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("NombreUsuario")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nombres")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("PasswordHash")
@@ -183,12 +228,6 @@ namespace APICarritoCompras.Migrations
 
                     b.Property<byte[]>("PasswordSalt")
                         .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("Telefono")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TipoUsuario")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -218,23 +257,34 @@ namespace APICarritoCompras.Migrations
                     b.ToTable("UsuarioRol");
                 });
 
+            modelBuilder.Entity("APICarritoCompras.Models.Cliente", b =>
+                {
+                    b.HasOne("APICarritoCompras.Models.Usuario", "Usuario")
+                        .WithMany("Cliente")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("APICarritoCompras.Models.Orden", b =>
                 {
+                    b.HasOne("APICarritoCompras.Models.Cliente", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("APICarritoCompras.Models.EstadoOrden", "EstadoOrden")
                         .WithMany()
                         .HasForeignKey("EstadoOrdenId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("APICarritoCompras.Models.Usuario", "Usuario")
-                        .WithMany("Ordenes")
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Cliente");
 
                     b.Navigation("EstadoOrden");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("APICarritoCompras.Models.OrdenProducto", b =>
@@ -303,7 +353,7 @@ namespace APICarritoCompras.Migrations
 
             modelBuilder.Entity("APICarritoCompras.Models.Usuario", b =>
                 {
-                    b.Navigation("Ordenes");
+                    b.Navigation("Cliente");
 
                     b.Navigation("UsuarioRoles");
                 });
